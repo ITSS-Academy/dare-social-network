@@ -14,6 +14,7 @@ export class LikeService {
   }
 
   getLikes(postId: string) {
+    console.log(postId);
     return this.httpClient.get(`like/${postId}`);
   }
 

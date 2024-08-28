@@ -152,17 +152,18 @@
       border-radius: 50%;
       background-color: var(--secondaryContainer);
     }
+    ::ng-deep .mat-mdc-icon-button{
+      width: 3.5rem!important;
+      height: 3.5rem!important;
+    }
+    ::ng-deep.mat-mdc-icon-button .mat-mdc-button-touch-target{
+      width: 2.5rem!important;
+      height: 2.5rem!important;
+    }
+
   }
 }
 
-::ng-deep .mat-mdc-icon-button{
-  width: 3.5rem!important;
-  height: 3.5rem!important;
-}
-::ng-deep.mat-mdc-icon-button .mat-mdc-button-touch-target{
-  width: 2.5rem!important;
-  height: 2.5rem!important;
-}
 
 //@media only screen
 //and (min-device-width: 768px)

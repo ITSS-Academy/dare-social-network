@@ -94,6 +94,7 @@ export class DetailPostComponent implements OnInit, OnDestroy {
   postId = '';
   commentList: CommentModel[] = [];
   likeList: LikeModel[] = [];
+  isLoading = false;
   constructor(
     private dialogRef: MatDialogRef<DetailPostComponent>,
     private location: Location,
@@ -130,8 +131,6 @@ export class DetailPostComponent implements OnInit, OnDestroy {
     this.subscriptions.push(
       this.postDetail$.subscribe((post) => {
         if (post.id) {
-          this.postDetails = post;
-          console.log('postDetails', this.postDetails);
           this.store.dispatch(
             LikeActions.getLikes({ postId: post.id.toString() }),
           );
@@ -139,6 +138,8 @@ export class DetailPostComponent implements OnInit, OnDestroy {
           this.store.dispatch(
             CommentAction.GetComments({ postId: post.id.toString() }),
           );
+          this.postDetails = post;
+          console.log('postDetails', this.postDetails);
         }
       }),
 
@@ -156,6 +157,7 @@ export class DetailPostComponent implements OnInit, OnDestroy {
 
       this.createCommentSuccess$.subscribe((success) => {
         if (success) {
+          this.isLoading = false;
           this.store.dispatch(
             CommentAction.GetComments({
               postId: this.postDetails.id.toString(),
@@ -166,6 +168,7 @@ export class DetailPostComponent implements OnInit, OnDestroy {
 
       this.createLikeSuccess$.subscribe((success) => {
         if (success) {
+          this.isLoading = false;
           this.store.dispatch(
             LikeActions.getLikes({ postId: this.postDetails.id.toString() }),
           );
@@ -183,7 +186,9 @@ export class DetailPostComponent implements OnInit, OnDestroy {
 
       this.createLikeSuccess$.subscribe((success) => {
         if (success) {
-          this.store.dispatch(LikeActions.getLikes({ postId: this.postId }));
+          this.store.dispatch(
+            LikeActions.getLikes({ postId: this.postDetails.id.toString() }),
+          );
         }
       }),
 
@@ -195,6 +200,8 @@ export class DetailPostComponent implements OnInit, OnDestroy {
         }
       }),
     );
+
+    this.likeCount$.subscribe((likeCount) => {});
   }
 
   onExit() {
@@ -236,6 +243,8 @@ export class DetailPostComponent implements OnInit, OnDestroy {
       console.log('comment is empty');
       return;
     } else {
+      this.isLoading = true;
+
       this.store.dispatch(
         CommentAction.createComment({
           content: comment.content,
@@ -248,6 +257,7 @@ export class DetailPostComponent implements OnInit, OnDestroy {
   }
 
   createLike() {
+    this.isLoading = true;
     if (!this.isLiked) {
       this.store.dispatch(
         LikeActions.createLike({
@@ -263,6 +273,7 @@ export class DetailPostComponent implements OnInit, OnDestroy {
   }
 
   deleteLike() {
+    this.isLoading = true;
     this.store.dispatch(
       LikeActions.deleteLike({ postId: this.postDetails.id.toString() }),
     );

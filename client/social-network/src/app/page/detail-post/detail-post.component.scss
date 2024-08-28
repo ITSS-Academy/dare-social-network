@@ -454,3 +454,7 @@ p {
   align-items: center;
   z-index: 1000;
 }
+.blur {
+  pointer-events: none;
+  opacity: 0.5;
+}

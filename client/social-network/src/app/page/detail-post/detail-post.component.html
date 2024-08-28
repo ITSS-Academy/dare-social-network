@@ -4,6 +4,7 @@
 
   </div>
 } @else {
+  <div [ngClass]="{ 'blur': isLoading }">
   <div class="container">
     <div class="detail-container">
       <div class="left-container">
@@ -105,5 +106,6 @@
       </div>
     </div>
   </div>
+</div>
 
 }
