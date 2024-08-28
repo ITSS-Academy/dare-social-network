@@ -1,3 +1,7 @@
+::ng-deep .mat-mdc-dialog-surface {
+  border-radius: 0;
+}
+
 .container {
   display: flex;
   width: 100vw;
@@ -341,7 +345,7 @@
 
       .send-button {
         flex-shrink: 0;
-        width: 3rem; // Adjust the width as needed
+         // Adjust the width as needed
       }
 
       .send-button {

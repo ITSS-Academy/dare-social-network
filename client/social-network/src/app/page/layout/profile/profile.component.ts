@@ -83,7 +83,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
           this.mineUid = profile.uid;
         }
       }),
-
     );
   }
 

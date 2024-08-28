@@ -23,13 +23,14 @@ export class RegisterComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private store: Store<{ profile: ProfileState; auth: AuthState }>,
-  ) { }
+  ) {}
 
   createMineSuccess$ = this.store.select('profile', 'isCreateSuccess');
 
   isGetMineSuccess$ = this.store.select('profile', 'isGetMineSuccess');
 
   uid = '';
+  isLoading = false;
 
   ngOnInit(): void {
     this.subscription.push(
@@ -47,9 +48,14 @@ export class RegisterComponent implements OnInit, OnDestroy {
     );
     this.createMineSuccess$.subscribe((isSuccess) => {
       if (isSuccess) {
-        this.router.navigate(['/home']).then(() => {
-          this.store.dispatch(profileActions.getMine({ uid: this.uid }));
-        });
+        this.store.dispatch(profileActions.getMine({ uid: this.uid }));
+      }
+    });
+
+    this.isGetMineSuccess$.subscribe((isSuccess) => {
+      if (isSuccess) {
+        this.isLoading = false;
+        this.router.navigate(['/home']);
       }
     });
 
@@ -82,7 +88,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   register() {
     let message = '';
-
+    this.isLoading = true;
     if (this.regisForm.invalid) {
       if (this.regisForm.controls['userName'].invalid) {
         message = 'Please fill in the username field.';

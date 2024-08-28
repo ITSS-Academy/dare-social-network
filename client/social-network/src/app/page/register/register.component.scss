@@ -34,6 +34,7 @@
   font-size: 32px;
   line-height: 1.286;
   color: var(--primary);
+  font-weight: bolder;
   //border: 1px solid gold;
   width: fit-content;
   height: 70px;
@@ -127,7 +128,7 @@
   font-size: 20px;
   letter-spacing: 0.5px;
   line-height: 1.5;
-  color: #FFFFFF;
+  color: var(--primary);
   width: 80%;
   height: 40px;
   font-weight: bold;
@@ -249,4 +250,10 @@
   .check-with-box {
     margin-left: 7%;
   }
+}
+
+
+.blur {
+  pointer-events: none;
+  opacity: 0.5;
 }

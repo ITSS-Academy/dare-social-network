@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { MaterialModule } from '../../../shared/material.module';
 import { PostComponent } from '../../../shared/components/post/post.component';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
