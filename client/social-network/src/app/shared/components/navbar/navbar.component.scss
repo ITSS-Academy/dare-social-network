@@ -124,16 +124,12 @@
   //   }
   // }
 
-
-
   .inactive:hover {
     .sidenav-nav-link {
       background-color: var(--surfaceDim);
     }
   }
 }
-
-
 
 .navbar-right{
   //width: 20%;
@@ -187,20 +183,36 @@
 //  }
 //}
 
-@media (max-width: 1300px) {
+@media (max-width: 1400px) {
+  .navbar-center {
+    width: 60%;
+  }
+}
+
+@media (max-width: 1000px) {
   .navbar-center {
     width: 70%;
   }
 }
 
-@media (max-width: 1024px) {
-  .navbar-center {
-    width: 70%;
-  }
-}
 
 @media (max-width: 768px) {
+  .navbar-left {
+    padding-left: 2rem;
+    width: 25%;
+  }
+
+  .navbar-right {
+    padding-right: 2rem;
+    width: 25%;
+  }
+
   .navbar-center {
-    width: 77%;
+    position: fixed;
+    bottom: 0;
+    height: 64px;
+    width: 100vw;
+    background-color: #fff;
+    z-index: 1000;
   }
 }

@@ -2,14 +2,14 @@
   <div class="navbar">
     <div class="navbar-left">
       <div class="logo-navbar">
-        <img (click)="handleLogoClick()" src="../public/images/logo_backiet.png" class="logo-navbar-icon" alt=""/>
+        <img src="../public/images/logo_backiet.png" class="logo-navbar-icon" alt=""/>
 <!--        <button class="logo-button" (click)="handleLogoClick()">-->
 <!--          <span class="material-symbols-outlined">menu</span>-->
 <!--        </button>-->
       </div>
     </div>
 
-    <div class="navbar-center" [class.hidden]="isNavbarCenterHidden">
+    <div class="navbar-center">
       <div id="sidebar-container">
         <div class="sidenav-nav">
           @for (route of dataRoutes; track i; let i = $index) {

@@ -12,10 +12,30 @@
   margin-bottom: 1rem;
   background-color: white;
   padding: 0 2rem;
+  transition: top 0.3s ease-in-out;
+}
+
+.fixed-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: calc(100% - 4rem);
+  z-index: 1000;
 }
 
 #content-layout-container {
   width: calc(100% - 4rem);
   height: calc(100% - 5rem);
   padding: 0 2rem;
+}
+
+@media (max-width: 768px) {
+  #navbar-layout-container {
+    width: 100%;
+    padding: 0;
+  }
+
+  //#content-layout-container {
+  //  padding-bottom: 100px;
+  //}
 }

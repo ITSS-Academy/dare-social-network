@@ -45,9 +45,6 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
   profileMine$ = this.store.select('profile', 'mine');
 
   logout$ = this.store.select('auth', 'logOutSuccess');
-
-  resizeListener!: () => void;
-
   ngOnInit(): void {
     this.subscriptions.push(
       this.router.events
@@ -69,9 +66,6 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
       }),
     );
     this.updateRouteSelected(this.router.url);
-
-    this.resizeListener = this.onResize.bind(this);
-    window.addEventListener('resize', this.resizeListener);
   }
 
   navigate(index: number) {
@@ -95,8 +89,6 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscriptions.forEach((subscription) => {
       subscription.unsubscribe();
     });
-
-    window.removeEventListener('resize', this.resizeListener);
   }
 
   private updateRouteSelected(url: string): void {
@@ -116,18 +108,5 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
     this.authService.logout();
     this.store.dispatch(ProfileActions.clearGetState());
   }
-
-  isNavbarCenterHidden = false;
-
-  handleLogoClick() {
-    if (window.innerWidth <= 820) {
-      this.toggleNavbarCenter();
-    }
-  }
-
-  toggleNavbarCenter() {
-    this.isNavbarCenterHidden = !this.isNavbarCenterHidden;
-  }
-
   onResize() {}
 }
