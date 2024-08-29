@@ -19,9 +19,6 @@ export const routes: Routes = [
   },
   {
     path: 'detail-post/:id',
-    loadChildren: () =>
-      import('./page/detail-post/detail-post.routes').then(
-        (m) => m.DETAIL_POST_ROUTES,
-      ),
+    component: DetailPostComponent,
   },
 ];

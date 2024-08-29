@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, RouterOutlet } from '@angular/router';
+import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { Auth, onAuthStateChanged } from '@angular/fire/auth';
 import { AuthCredentialModel } from './model/auth.model';
 import { select, Store } from '@ngrx/store';
@@ -11,6 +11,9 @@ import { ProfileModel } from './model/profile.model';
 import * as ProfileActions from './ngrx/profile/profile.actions';
 import { ShareModule } from './shared/share.module';
 import { MaterialModule } from './shared/material.module';
+import * as PostActions from './ngrx/post/post.actions';
+import { MatDialog } from '@angular/material/dialog';
+import { DetailPostComponent } from './page/detail-post/detail-post.component';
 
 @Component({
   selector: 'app-root',
@@ -41,6 +44,9 @@ export class AppComponent implements OnInit {
   //isShowSpinner = false;
 
   constructor(
+    private route: ActivatedRoute,
+    private dialogRef: MatDialog,
+
     private router: Router,
     private auth: Auth,
     private store: Store<{
@@ -82,6 +88,22 @@ export class AppComponent implements OnInit {
     this.storeIdToken$.subscribe((idToken) => {
       console.log('idToken', idToken);
     });
+    this.route.url.subscribe((url) => {
+      console.log('url', url);
+      const urlSegment = url.join('/');
+      if (urlSegment.startsWith('detail/')) {
+        const id = BigInt(urlSegment.split('/')[1]);
+        console.log('iddetail at home' + ':', id);
+        //convert string to bigint
+        this.store.dispatch(PostActions.getPostById({ id: id }));
+
+        this.dialogRef.open(DetailPostComponent, {
+          maxWidth: '100%',
+          maxHeight: '100%',
+          closeOnNavigation: true,
+        });
+      }
+    });
 
     combineLatest([
       this.authCredential$,
@@ -99,10 +121,20 @@ export class AppComponent implements OnInit {
       ]) => {
         if (authCredential.uid) {
           if (isGetMineSuccess && mine?.uid) {
-            console.log(mine);
-            this.router.navigate(['/home']).then(() => {
+            const currentUrl = this.router.url;
+            if (
+              currentUrl.includes('/profile') ||
+              currentUrl.includes('/detail-post') ||
+              currentUrl.includes('/search')
+            ) {
               this.isShowSpinner = false;
-            });
+              this.router.navigate([currentUrl]);
+            } else {
+              console.log(mine);
+              this.router.navigate(['/home']).then(() => {
+                this.isShowSpinner = false;
+              });
+            }
           } else if (isGetMineFailure && getMineError.status) {
             console.log(getMineError);
             this.router.navigate(['/register']).then(() => {

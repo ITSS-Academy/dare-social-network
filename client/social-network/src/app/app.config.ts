@@ -1,5 +1,5 @@
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withComponentInputBinding } from '@angular/router';
 
 import { routes } from './app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
@@ -22,13 +22,13 @@ import { StorageEffects } from './ngrx/storage/storage.effects';
 import { SearchReducer } from './ngrx/search/search.reducer';
 import { searchEffects } from './ngrx/search/search.effects';
 import { CommentEffects } from './ngrx/comment/comment.effects';
-import {CommentReducer} from "./ngrx/comment/comment.reducer";
-import {LikeReducer} from "./ngrx/like/like.reducers";
-import {LikeEffects} from "./ngrx/like/like.effects";
+import { CommentReducer } from './ngrx/comment/comment.reducer';
+import { LikeReducer } from './ngrx/like/like.reducers';
+import { LikeEffects } from './ngrx/like/like.effects';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes),
+    provideRouter(routes, withComponentInputBinding()),
     provideAnimationsAsync(),
     provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
     provideAuth(() => getAuth()),
@@ -48,8 +48,8 @@ export const appConfig: ApplicationConfig = {
     provideState({ name: 'post', reducer: postReducer }),
     provideState({ name: 'storage', reducer: storageReducer }),
     provideState({ name: 'search', reducer: SearchReducer }),
-    provideState({name: 'comment', reducer: CommentReducer}),
-    provideState({name: 'like', reducer: LikeReducer}),
+    provideState({ name: 'comment', reducer: CommentReducer }),
+    provideState({ name: 'like', reducer: LikeReducer }),
     provideHttpClient(),
     provideAnimationsAsync(),
     HttpClientAuth,

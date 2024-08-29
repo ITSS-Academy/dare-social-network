@@ -17,6 +17,7 @@ import {
 } from '@angular/forms';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import {
+  MAT_DIALOG_DATA,
   MatDialogActions,
   MatDialogClose,
   MatDialogRef,
@@ -74,6 +75,10 @@ import { map } from 'rxjs/operators';
   ],
   templateUrl: './detail-post.component.html',
   styleUrls: ['./detail-post.component.scss'],
+  providers: [
+    { provide: MatDialogRef, useValue: {} },
+    { provide: MAT_DIALOG_DATA, useValue: {} },
+  ],
 })
 export class DetailPostComponent implements OnInit, OnDestroy {
   subscriptions: Subscription[] = [];
@@ -201,13 +206,23 @@ export class DetailPostComponent implements OnInit, OnDestroy {
       }),
     );
 
+    this.activeRoute.url.subscribe((url) => {
+      const urlSegment = url.join('/');
+      if (urlSegment.startsWith('detail-post/')) {
+        const id = BigInt(urlSegment.split('/')[1]);
+        //convert string to bigint
+
+        this.store.dispatch(PostActions.getPostById({ id: id }));
+      }
+    });
+
     this.likeCount$.subscribe((likeCount) => {});
   }
 
   onExit() {
     console.log('exit');
-    //how to close dialog
-    this.dialogRef.close();
+
+    this.location.back();
     this.commentList = [];
     this.store.dispatch(CommentAction.clearCommentState());
     this.store.dispatch(LikeActions.clearLikeState());

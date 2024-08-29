@@ -83,9 +83,9 @@ export class PostComponent implements OnInit {
     // console.log('post', post);
 
     //change url to detail. change url but dont change page
-    dialogRef.afterClosed().subscribe(() => {
-      this.location.go(currentUrl);
-    });
+    // dialogRef.afterClosed().subscribe(() => {
+    //   this.location.go(currentUrl);
+    // });
   }
 
   deletePost() {
