@@ -1,12 +1,13 @@
+<div [ngClass]="{ 'blur': isUpdating }">
 
 <div id="edit-profile">
   <form [formGroup]="editProfileForm">
     <div class="form">
-      <img [src]="urlsa">
+      <img [src]="urlsa"  onerror="this.onerror=null;this.src='public/images/avatar.png';">
       <input type="file" (change)="onSelectedFile($event)" id="fileInput" hidden>
       @if(isUploading$|async){
         <mat-spinner [diameter]="40" ></mat-spinner>
-        
+
       } @else {
 
         <button class="upload" mat-raised-button (click)="document.getElementById('fileInput')?.click()">Upload</button>
@@ -35,4 +36,5 @@
       <button id="confirm" (click)="onSaveClick()" mat-raised-button>Save</button>
     </div>
   </form>
+</div>
 </div>

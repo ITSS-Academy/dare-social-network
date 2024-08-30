@@ -56,7 +56,7 @@ export class EditProfileComponent implements OnInit, OnDestroy {
   };
   editProfileForm = new FormGroup({
     name: new FormControl('', [
-      Validators.minLength(10),
+      Validators.minLength(5),
       noSpecialCharacters,
       noStartingNumber,
     ]),
@@ -71,9 +71,10 @@ export class EditProfileComponent implements OnInit, OnDestroy {
   imageUrls$ = this.store.select('storage', 'url');
 
   isUploading$ = this.store.select('storage', 'isUploading');
+  uploadError$ = this.store.select('storage', 'uploadError');
 
   profileMine$ = this.store.select('profile', 'mine');
-  isUpdating$ = this.store.select('profile', 'isUpdating');
+  isUpdating = false;
   isUpdateSuccess$ = this.store.select('profile', 'isUpdateSuccess');
 
   constructor(
@@ -114,8 +115,21 @@ export class EditProfileComponent implements OnInit, OnDestroy {
           });
         }
       }),
+
+      this.uploadError$.subscribe((error) => {
+        if (error) {
+          this.snackBar.open('Image size must be under 5MB ', 'Close', {
+            duration: 2000,
+            horizontalPosition: 'right',
+            verticalPosition: 'top',
+          });
+        }
+      }),
+
       this.isUpdateSuccess$.subscribe((isUpdateSuccess) => {
         if (isUpdateSuccess) {
+          this.isUpdating = false;
+
           this.store.dispatch(ProfileActions.getMine({ uid: this.uid }));
           this.snackBar.open('Update successfully', 'Close', {
             duration: 2000,
@@ -160,7 +174,7 @@ export class EditProfileComponent implements OnInit, OnDestroy {
   onSaveClick(): void {
     const nameControl = this.editProfileForm.get('name');
     if (nameControl?.invalid) {
-      let message = 'Name must be at least 10 characters long';
+      let message = 'Name must be at least 5 characters long';
       if (nameControl.hasError('specialCharacters')) {
         message = 'Name must not contain special characters';
       } else if (nameControl.hasError('startingNumber')) {
@@ -174,6 +188,8 @@ export class EditProfileComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // this.avatarChanged.emit(this.url);
+    this.isUpdating = true;
     this.profileForm = {
       uid: this.editProfileForm.value.uid ?? '',
       avatarUrl: this.profileForm.avatarUrl ?? this.profileMine.avatarUrl,

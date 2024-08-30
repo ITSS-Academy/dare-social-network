@@ -35,7 +35,6 @@ import { PostComponent } from '../../../shared/components/post/post.component';
 })
 export class SearchComponent implements OnInit, OnDestroy {
   searchQuery: string = '';
-  items: PostModel[] = [];
   posts: PostModel[] = [];
   searchControl = new FormControl();
   subscription: Subscription[] = [];

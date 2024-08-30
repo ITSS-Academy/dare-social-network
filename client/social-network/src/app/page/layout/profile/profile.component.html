@@ -28,7 +28,7 @@
           </div>
         </div>
         <div class="edit-button">
-          <img [src]="profileMine.avatarUrl" alt="avatar">
+          <img [src]="profileMine.avatarUrl" alt="avatar"  onerror="this.onerror=null;this.src='public/images/avatar.png';">
           @if(mineUid === yoursUid){
             <button id="edit" mat-raised-button (click)="openEditProfileDialog()">Edit Profile</button>
 

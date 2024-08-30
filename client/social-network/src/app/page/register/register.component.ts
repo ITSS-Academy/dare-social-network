@@ -67,7 +67,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
     email: new FormControl(''),
     userName: new FormControl('', [
       Validators.required,
-      Validators.minLength(10),
+      Validators.minLength(5),
     ]),
     avatarUrl: new FormControl(''),
     uid: new FormControl(''),
@@ -96,8 +96,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
         message = 'Please agree to the terms and conditions.';
       }
       // @ts-ignore
-      if (this.regisForm.value.userName.length < 10) {
-        message = 'Please enter a valid username with at least 10 characters.';
+      if (this.regisForm.value.userName.length < 6 ) {
+        message = 'Please enter a valid username with at least 5 characters.';
       } else if (/^[0-9]/.test(<string>this.regisForm.value.userName)) {
         message = 'Username must not start with a number.';
       } else if (/[^a-zA-Z0-9]/.test(<string>this.regisForm.value.userName)) {

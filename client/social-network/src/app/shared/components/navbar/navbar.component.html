@@ -38,7 +38,7 @@
           @if(!(profileMine$ | async)?.avatarUrl){
             <img src="../public/images/avatar.png" class="avatar-navbar-icon" loading="lazy" alt=""/>
           } @else {
-            <img src="{{(profileMine$ | async)?.avatarUrl}}" class="avatar-navbar-icon">
+            <img src="{{(profileMine$ | async)?.avatarUrl}}" class="avatar-navbar-icon" onerror="this.onerror=null;this.src='public/images/avatar.png';">
           }
         </button>
         <mat-menu #menu="matMenu">

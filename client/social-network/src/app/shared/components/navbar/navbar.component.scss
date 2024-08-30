@@ -148,6 +148,7 @@
       height: 2.5rem;
       border-radius: 50%;
       background-color: var(--secondaryContainer);
+      object-fit: cover;
     }
     ::ng-deep .mat-mdc-icon-button{
       width: 3.5rem!important;
