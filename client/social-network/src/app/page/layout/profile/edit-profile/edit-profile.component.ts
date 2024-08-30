@@ -64,14 +64,14 @@ export class EditProfileComponent implements OnInit, OnDestroy {
   imageUrls$ = this.store.select('storage', 'url');
 
   isUploading$ = this.store.select('storage', 'isUploading');
+  uploadError$ = this.store.select('storage', 'uploadError');
 
   profileMine$ = this.store.select('profile', 'mine');
-  isUpdating$ = this.store.select('profile', 'isUpdating');
+  isUpdating = false;
   isUpdateSuccess$ = this.store.select('profile', 'isUpdateSuccess');
 
   constructor(
     public snackBar: MatSnackBar,
-
 
     public dialog: MatDialog,
     public store: Store<{
@@ -86,7 +86,6 @@ export class EditProfileComponent implements OnInit, OnDestroy {
     this.subscription.push(
       this.profileMine$.subscribe((profile) => {
         if (profile) {
-
           this.uid = profile.uid;
           this.editProfileForm.setValue({
             name: profile.userName,
@@ -109,9 +108,21 @@ export class EditProfileComponent implements OnInit, OnDestroy {
           });
         }
       }),
+
+      this.uploadError$.subscribe((error) => {
+        if (error) {
+          this.snackBar.open('Image size must be under 5MB ', 'Close', {
+            duration: 2000,
+            horizontalPosition: 'right',
+            verticalPosition: 'top',
+          });
+        }
+      }),
+
       this.isUpdateSuccess$.subscribe((isUpdateSuccess) => {
         if (isUpdateSuccess) {
-          // this.dialog.closeAll();
+          this.isUpdating = false;
+
           this.store.dispatch(ProfileActions.getMine({ uid: this.uid }));
           //when update success, show snackbar
           this.snackBar.open('Update successfully', 'Close', {
@@ -122,7 +133,6 @@ export class EditProfileComponent implements OnInit, OnDestroy {
 
           this.dialog.closeAll();
         }
-
       }),
     );
   }
@@ -156,10 +166,10 @@ export class EditProfileComponent implements OnInit, OnDestroy {
 
   onSaveClick(): void {
     // this.avatarChanged.emit(this.url);
+    this.isUpdating = true;
     this.profileForm = {
       uid: this.editProfileForm.value.uid ?? '',
-      avatarUrl:
-        this.profileForm.avatarUrl ?? this.profileMine.avatarUrl,
+      avatarUrl: this.profileForm.avatarUrl ?? this.profileMine.avatarUrl,
       email: this.editProfileForm.value.email ?? '',
       bio: this.editProfileForm.value.bio ?? '',
       userName: this.editProfileForm.value.name ?? '',

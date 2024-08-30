@@ -2,7 +2,8 @@ import {
   Component,
   ElementRef,
   OnDestroy,
-  OnInit, signal,
+  OnInit,
+  signal,
   ViewChild,
 } from '@angular/core';
 import { MaterialModule } from '../../../shared/material.module';
@@ -21,7 +22,8 @@ import * as PostAction from '../../../ngrx/post/post.actions';
 import { PostState } from '../../../ngrx/post/post.state';
 import { Subscription } from 'rxjs';
 import { getAllPost } from '../../../ngrx/post/post.actions';
-import {PostDataModel} from "../../../model/post-data.model";
+import { PostDataModel } from '../../../model/post-data.model';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-creator',
@@ -49,9 +51,11 @@ export class CreatorComponent implements OnInit, OnDestroy {
   subscription: Subscription[] = [];
   isLoading = true;
   isCreating$ = this.store.select('post', 'isCreating');
-
+  isCreateSuccess$ = this.store.select('post', 'isCreateSuccess');
 
   constructor(
+    public snackBar: MatSnackBar,
+
     private store: Store<{
       profile: ProfileState;
       post: PostState;
@@ -64,11 +68,11 @@ export class CreatorComponent implements OnInit, OnDestroy {
         }
       }),
     );
-
   }
 
   ngOnDestroy(): void {
     this.subscription.forEach((sub) => sub.unsubscribe());
+    this.isCreateSuccess$.subscribe().unsubscribe();
   }
   myFile: File[] = [];
 
@@ -77,6 +81,16 @@ export class CreatorComponent implements OnInit, OnDestroy {
       this.isCreating$.subscribe((isCreating) => {
         this.isLoading = isCreating;
         console.log('isCreating: ', isCreating);
+      }),
+
+      this.isCreateSuccess$.subscribe((isCreateSuccess) => {
+        if (isCreateSuccess) {
+          this.snackBar.open('Post created successfully', 'Close', {
+            duration: 2000,
+            horizontalPosition: 'right',
+            verticalPosition: 'top',
+          });
+        }
       }),
     );
   }
@@ -104,7 +118,7 @@ export class CreatorComponent implements OnInit, OnDestroy {
     this.fileInput.nativeElement.click();
   }
 
-  isImageUploaded= false;
+  isImageUploaded = false;
   handleFileInput(event: Event) {
     const input = event.target as HTMLInputElement;
     this.myFile = [];
@@ -122,8 +136,7 @@ export class CreatorComponent implements OnInit, OnDestroy {
       reader.readAsDataURL(input.files[0]);
 
       console.log('Post Form: ', this.postForm);
-
-    }else{
+    } else {
       this.resetState();
     }
     console.log('My File: ', this.myFile);
@@ -145,24 +158,37 @@ export class CreatorComponent implements OnInit, OnDestroy {
     // console.log('Image: ', this.imageSrc);
 
     if (!inputFilled || !imageSrcFilled) {
-      alert('Please fill in all fields');
+      this.snackBar.open('Please fill in all fields', 'Close', {
+        duration: 2000,
+        horizontalPosition: 'right',
+        verticalPosition: 'top',
+      });
       return;
-    }if(this.myFile.length > 0) {
-      for (const file of this.myFile){
-
+    }
+    if (this.myFile.length > 0) {
+      for (const file of this.myFile) {
         if (!['image/png', 'image/jpeg'].includes(file.type)) {
-          alert('Please upload a png or jpeg file');
+          this.snackBar.open('Please upload a png or jpeg file', 'Close', {
+            duration: 2000,
+            horizontalPosition: 'right',
+            verticalPosition: 'top',
+          });
           return;
         }
 
-        if (!this.imageSizeLimit(file)){
-          alert('Image size must be less than 5MB');
+        if (!this.imageSizeLimit(file)) {
+          this.snackBar.open('Image size must be less than 5MB', 'Close', {
+            duration: 2000,
+            horizontalPosition: 'right',
+            verticalPosition: 'top',
+          });
           return;
+        }
       }
     }
-    }
 
-    this.createPostForm.value.title = this.createPostForm.value?.title as string;
+    this.createPostForm.value.title = this.createPostForm.value
+      ?.title as string;
     //   this.textLimit(
     //   this.createPostForm.value?.title as string,
     //   10,
@@ -211,7 +237,9 @@ export class CreatorComponent implements OnInit, OnDestroy {
     this.myFile = [];
 
     // Reset the file input field
-    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const fileInput = document.querySelector(
+      'input[type="file"]',
+    ) as HTMLInputElement;
     if (fileInput) {
       fileInput.value = ''; // Clear the file input value
     }
@@ -228,4 +256,3 @@ export class CreatorComponent implements OnInit, OnDestroy {
   //
   // }
 }
-

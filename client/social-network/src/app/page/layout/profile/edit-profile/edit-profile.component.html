@@ -1,3 +1,4 @@
+<div [ngClass]="{ 'blur': isUpdating }">
 
 <div id="edit-profile">
   <form [formGroup]="editProfileForm">
@@ -35,4 +36,5 @@
       <button id="confirm" (click)="onSaveClick()" mat-raised-button>Save</button>
     </div>
   </form>
+</div>
 </div>

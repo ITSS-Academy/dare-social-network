@@ -1,18 +1,22 @@
 <div class="search">
 
   <mat-form-field appearance="outline" class="search-frame">
-      <mat-label class="search-input" >Search</mat-label>
-      <input matInput  placeholder="Search" [formControl]="searchControl">
+    <mat-label class="search-input">Search</mat-label>
+    <input matInput placeholder="Search" [formControl]="searchControl">
   </mat-form-field>
   <div class="result">
     Result
   </div>
 
-  @if(isSearching$|async){
-      <div class="loading-overlay">
-        <mat-spinner class="loading-spinner"></mat-spinner>
-      </div>
-    }@else {
+  @if (isSearching$|async) {
+    <div class="loading-overlay">
+      <mat-spinner class="loading-spinner"></mat-spinner>
+    </div>
+  } @else if (posts === undefined || posts.length === 0) {
+    <div class="no-post">
+      <img src="public/images/searchNotFound.jpg">
+    </div>
+  } @else {
     <div class="grid-container"
          infiniteScroll
          [infiniteScrollDistance]="2"
@@ -20,15 +24,16 @@
          [fromRoot]="true"
     >
 
+
       <div class="masonry-container">
         <div class="masonry-item" *ngFor="let post of posts">
           <app-post [post]="post"></app-post>
         </div>
       </div>
     </div>
-    }
-<!--    @for (item of filteredItems ; track $index){-->
-<!--     <img class="img-1" src="{{item.imageUrls}}" alt="img">-->
-<!--    }-->
+  }
+  <!--    @for (item of filteredItems ; track $index){-->
+  <!--     <img class="img-1" src="{{item.imageUrls}}" alt="img">-->
+  <!--    }-->
 
-  </div>
+</div>
