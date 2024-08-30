@@ -199,6 +199,7 @@ export class DetailPostComponent implements OnInit, OnDestroy {
 
       this.deleteLikeSuccess$.subscribe((success) => {
         if (success) {
+          this.isLoading = false;
           this.store.dispatch(
             LikeActions.getLikes({ postId: this.postDetails.id.toString() }),
           );
@@ -231,23 +232,28 @@ export class DetailPostComponent implements OnInit, OnDestroy {
   isLiked = false;
 
   navigateToProfile() {
-    this.router.navigateByUrl(`/profile/${this.postDetails.uid}`).then();
-    this.store.dispatch(PostActions.clearMinePost());
-    //close dialog
+    this.router.navigateByUrl(`/profile/${this.postDetails.uid}`).then(() => {
+      console.log('Navigated to profile:', `/profile/${this.postDetails.uid}`);
+    });
   }
 
   navigateToCommentProfile(uid: string) {
-    this.router
-      .navigateByUrl(`/profile/${uid}`)
-      .then(() => this.dialogRef.close());
-    this.store.dispatch(PostActions.clearMinePost());
+    this.router.routeReuseStrategy.shouldReuseRoute = () => false;
+    this.router.onSameUrlNavigation = 'reload';
+    this.router.navigate([`/profile`, uid]).then(() => {
+      console.log('Navigated to comment profile:', `/profile/${uid}`);
+      this.dialogRef.close();
+    });
   }
 
   navigateToMineProfile() {
-    this.router
-      .navigateByUrl(`/profile/${this.profileMine.uid}`)
-      .then(() => this.dialogRef.close());
-    this.store.dispatch(PostActions.clearMinePost());
+    this.router.navigate([`/profile`, this.profileMine.uid]).then(() => {
+      console.log(
+        'Navigated to mine profile:',
+        `/profile/${this.profileMine.uid}`,
+      );
+      this.dialogRef.close();
+    });
   }
 
   createComment() {

@@ -112,11 +112,10 @@ export class RegisterComponent implements OnInit, OnDestroy {
         bio: '',
         avatarUrl: this.regisForm.value.avatarUrl ?? '',
       };
+      this.store.dispatch(profileActions.createMine({ mine: this.regisData }));
     }
 
     console.log(this.regisData);
-
-    this.store.dispatch(profileActions.createMine({ mine: this.regisData }));
   }
 
   readonly dialog = inject(MatDialog);
