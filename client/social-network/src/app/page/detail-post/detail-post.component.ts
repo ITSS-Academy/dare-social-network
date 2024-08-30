@@ -24,7 +24,7 @@ import {
 } from '@angular/material/dialog';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
 import { PostModel } from '../../model/post.model';
@@ -46,6 +46,8 @@ import { LikeModel } from '../../model/like.model';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { Location } from '@angular/common';
 import { map } from 'rxjs/operators';
+
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-detail-post',
@@ -112,7 +114,7 @@ export class DetailPostComponent implements OnInit, OnDestroy {
       comment: CommentState;
       like: LikeState;
     }>,
-    private activeRoute: ActivatedRoute,
+    private activeRoute: ActivatedRoute
   ) {
     const { id } = this.activeRoute.snapshot.params;
     console.log('id:', id);
@@ -137,11 +139,11 @@ export class DetailPostComponent implements OnInit, OnDestroy {
       this.postDetail$.subscribe((post) => {
         if (post.id) {
           this.store.dispatch(
-            LikeActions.getLikes({ postId: post.id.toString() }),
+            LikeActions.getLikes({ postId: post.id.toString() })
           );
 
           this.store.dispatch(
-            CommentAction.GetComments({ postId: post.id.toString() }),
+            CommentAction.GetComments({ postId: post.id.toString() })
           );
           this.postDetails = post;
           console.log('postDetails', this.postDetails);
@@ -166,7 +168,7 @@ export class DetailPostComponent implements OnInit, OnDestroy {
           this.store.dispatch(
             CommentAction.GetComments({
               postId: this.postDetails.id.toString(),
-            }),
+            })
           );
         }
       }),
@@ -175,7 +177,7 @@ export class DetailPostComponent implements OnInit, OnDestroy {
         if (success) {
           this.isLoading = false;
           this.store.dispatch(
-            LikeActions.getLikes({ postId: this.postDetails.id.toString() }),
+            LikeActions.getLikes({ postId: this.postDetails.id.toString() })
           );
         }
       }),
@@ -184,7 +186,7 @@ export class DetailPostComponent implements OnInit, OnDestroy {
         if (likes) {
           this.likeList = likes;
           this.isLiked = likes.some(
-            (like) => like.uid === this.profileMine.uid,
+            (like) => like.uid === this.profileMine.uid
           );
         }
       }),
@@ -192,7 +194,7 @@ export class DetailPostComponent implements OnInit, OnDestroy {
       this.createLikeSuccess$.subscribe((success) => {
         if (success) {
           this.store.dispatch(
-            LikeActions.getLikes({ postId: this.postDetails.id.toString() }),
+            LikeActions.getLikes({ postId: this.postDetails.id.toString() })
           );
         }
       }),
@@ -201,10 +203,10 @@ export class DetailPostComponent implements OnInit, OnDestroy {
         if (success) {
           this.isLoading = false;
           this.store.dispatch(
-            LikeActions.getLikes({ postId: this.postDetails.id.toString() }),
+            LikeActions.getLikes({ postId: this.postDetails.id.toString() })
           );
         }
-      }),
+      })
     );
 
     this.activeRoute.url.subscribe((url) => {
@@ -218,6 +220,15 @@ export class DetailPostComponent implements OnInit, OnDestroy {
     });
 
     this.likeCount$.subscribe((likeCount) => {});
+
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) => {
+        // Update the URL based on the current route
+        const currentRoute = this.router.url;
+        console.log('Current Route:', currentRoute);
+        // You can perform additional logic here if needed
+      });
   }
 
   onExit() {
@@ -250,7 +261,7 @@ export class DetailPostComponent implements OnInit, OnDestroy {
     this.router.navigate([`/profile`, this.profileMine.uid]).then(() => {
       console.log(
         'Navigated to mine profile:',
-        `/profile/${this.profileMine.uid}`,
+        `/profile/${this.profileMine.uid}`
       );
       this.dialogRef.close();
     });
@@ -271,9 +282,27 @@ export class DetailPostComponent implements OnInit, OnDestroy {
           content: comment.content,
           postId: this.postDetails.id,
           uid: this.profileMine.uid,
-        }),
+        })
       );
       console.log('comment created');
+
+      this.createCommentSuccess$.subscribe({
+        next: (success) => {
+          if (success) {
+            this.isLoading = false;
+            this.commentForm.reset(); // Reset the comment input
+            this.store.dispatch(
+              CommentAction.GetComments({
+                postId: this.postDetails.id.toString(),
+              })
+            );
+          }
+        },
+        error: () => {
+          this.isLoading = false;
+          // Handle error
+        },
+      });
     }
   }
 
@@ -287,17 +316,47 @@ export class DetailPostComponent implements OnInit, OnDestroy {
             postId: this.postDetails.id,
             uid: this.profileMine.uid,
           },
-        }),
+        })
       );
-      this.isLiked = true;
+
+      this.createLikeSuccess$.subscribe({
+        next: (success) => {
+          if (success) {
+            this.isLoading = false;
+            this.isLiked = true;
+            this.store.dispatch(
+              LikeActions.getLikes({ postId: this.postDetails.id.toString() })
+            );
+          }
+        },
+        error: () => {
+          this.isLoading = false;
+          // Handle error
+        },
+      });
     }
   }
 
   deleteLike() {
     this.isLoading = true;
     this.store.dispatch(
-      LikeActions.deleteLike({ postId: this.postDetails.id.toString() }),
+      LikeActions.deleteLike({ postId: this.postDetails.id.toString() })
     );
-    this.isLiked = false;
+
+    this.deleteLikeSuccess$.subscribe({
+      next: (success) => {
+        if (success) {
+          this.isLoading = false;
+          this.isLiked = false;
+          this.store.dispatch(
+            LikeActions.getLikes({ postId: this.postDetails.id.toString() })
+          );
+        }
+      },
+      error: () => {
+        this.isLoading = false;
+        // Handle error
+      },
+    });
   }
 }

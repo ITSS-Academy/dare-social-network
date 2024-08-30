@@ -23,6 +23,7 @@
     "@angular/router": "^18.1.0",
     "@ngrx/effects": "^18.0.2",
     "@ngrx/store": "^18.0.2",
+    "date-fns": "^3.6.0",
     "ngx-infinite-scroll": "^18.0.0",
     "ngx-skeleton-loader": "^9.0.0",
     "npm-check-updates": "^17.0.6",
