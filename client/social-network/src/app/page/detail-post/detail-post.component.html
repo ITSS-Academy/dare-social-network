@@ -30,7 +30,7 @@
                   <img class="avatar" (click)="navigateToProfile()" [src]="postDetails.uid | idToAvatar| async" alt="Avatar">
                   <div class="info">
                     <p class="name">{{ postDetails.uid | idToName| async }}</p>
-                    <p class="follower">1.8 triệu người theo dõi</p>
+<!--                    <p class="follower">1.8 triệu người theo dõi</p>-->
                   </div>
                 </div>
                 <div class="content-right">
@@ -94,7 +94,7 @@
               <form [formGroup]="commentForm">
                 <mat-form-field class="example-full-width input-border" appearance="outline">
                   <mat-label class="input-info">Comment</mat-label>
-                  <input formControlName="content" matInput placeholder="comment"/>
+                  <input formControlName="content" matInput placeholder="comment" (keydown.enter)="createComment()"/>
                   <button mat-icon-button class="send-button" (click)="createComment()" type="button">
                     <span class="material-symbols-outlined">send</span>
                   </button>

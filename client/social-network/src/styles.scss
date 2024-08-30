@@ -6,6 +6,10 @@
 
 @include mat.core();
 
+.cdk-global-scrollblock {
+  overflow: hidden !important;
+}
+
 $_palettes: (
   primary: (0: #000000,
     10: #2c1600,

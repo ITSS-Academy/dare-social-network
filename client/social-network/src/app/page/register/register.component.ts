@@ -46,18 +46,18 @@ export class RegisterComponent implements OnInit, OnDestroy {
         }
       }),
     );
-    this.createMineSuccess$.subscribe((isSuccess) => {
-      if (isSuccess) {
-        this.store.dispatch(profileActions.getMine({ uid: this.uid }));
-      }
-    });
-
-    this.isGetMineSuccess$.subscribe((isSuccess) => {
-      if (isSuccess) {
-        this.isLoading = false;
-        this.router.navigate(['/home']);
-      }
-    });
+    // this.createMineSuccess$.subscribe((isSuccess) => {
+    //   if (isSuccess) {
+    //     this.store.dispatch(profileActions.getMine({ uid: this.uid }));
+    //   }
+    // });
+    //
+    // this.isGetMineSuccess$.subscribe((isSuccess) => {
+    //   if (isSuccess) {
+    //     this.isLoading = false;
+    //     this.router.navigate(['/home']);
+    //   }
+    // });
 
     // Vô hiệu hóa trường email khi cần thiết
     // this.disableEmailField();
@@ -98,10 +98,14 @@ export class RegisterComponent implements OnInit, OnDestroy {
       // @ts-ignore
       if (this.regisForm.value.userName.length < 10) {
         message = 'Please enter a valid username with at least 10 characters.';
+      } else if (/^[0-9]/.test(<string>this.regisForm.value.userName)) {
+        message = 'Username must not start with a number.';
+      } else if (/[^a-zA-Z0-9]/.test(<string>this.regisForm.value.userName)) {
+        message = 'Username must not contain special characters.';
       }
-      // Ngăn không cho tiếp tục nếu có lỗi
       if (message) {
         this.openDialog(message);
+        this.isLoading = false; // Reset loading state
         return;
       }
     } else {
@@ -117,6 +121,24 @@ export class RegisterComponent implements OnInit, OnDestroy {
     console.log(this.regisData);
 
     this.store.dispatch(profileActions.createMine({ mine: this.regisData }));
+
+    // Handle success and error states
+    this.createMineSuccess$.subscribe((isSuccess) => {
+      if (isSuccess) {
+        this.store.dispatch(profileActions.getMine({ uid: this.uid }));
+      } else {
+        this.isLoading = false; // Reset loading state on error
+      }
+    });
+
+    this.isGetMineSuccess$.subscribe((isSuccess) => {
+      if (isSuccess) {
+        this.isLoading = false;
+        this.router.navigate(['/home']);
+      } else {
+        this.isLoading = false; // Reset loading state on error
+      }
+    });
   }
 
   readonly dialog = inject(MatDialog);

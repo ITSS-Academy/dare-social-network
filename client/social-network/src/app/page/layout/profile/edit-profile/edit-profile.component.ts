@@ -1,14 +1,6 @@
-import {
-  Component,
-  EventEmitter,
-  Inject,
-  OnDestroy,
-  OnInit,
-  Output,
-  signal,
-} from '@angular/core';
+import { Component, EventEmitter, Inject, OnDestroy, OnInit, Output, signal } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup, Validators, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
 import { MaterialModule } from '../../../../shared/material.module';
 import { ShareModule } from '../../../../shared/share.module';
 import { Store } from '@ngrx/store';
@@ -19,8 +11,19 @@ import { Subscription } from 'rxjs';
 import { ProfileModel } from '../../../../model/profile.model';
 import { ProfileState } from '../../../../ngrx/profile/profile.state';
 import * as ProfileActions from '../../../../ngrx/profile/profile.actions';
-
 import { MatSnackBar } from '@angular/material/snack-bar';
+
+// Custom validator to check if the string contains special characters
+const noSpecialCharacters: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+  const forbidden = /[^a-zA-Z0-9]/.test(control.value);
+  return forbidden ? { specialCharacters: { value: control.value } } : null;
+};
+
+// Custom validator to check if the string starts with a number
+const noStartingNumber: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+  const forbidden = /^[0-9]/.test(control.value);
+  return forbidden ? { startingNumber: { value: control.value } } : null;
+};
 
 @Component({
   selector: 'app-edit-profile',
@@ -52,7 +55,11 @@ export class EditProfileComponent implements OnInit, OnDestroy {
     avatarUrl: this.profileMine.avatarUrl,
   };
   editProfileForm = new FormGroup({
-    name: new FormControl(''),
+    name: new FormControl('', [
+      Validators.minLength(10),
+      noSpecialCharacters,
+      noStartingNumber,
+    ]),
     bio: new FormControl(''),
     uid: new FormControl(''),
     email: new FormControl(''),
@@ -71,8 +78,6 @@ export class EditProfileComponent implements OnInit, OnDestroy {
 
   constructor(
     public snackBar: MatSnackBar,
-
-
     public dialog: MatDialog,
     public store: Store<{
       storage: StorageState;
@@ -82,11 +87,11 @@ export class EditProfileComponent implements OnInit, OnDestroy {
   ) {
     this.urlsa = data.avatarUrl;
   }
+
   ngOnInit(): void {
     this.subscription.push(
       this.profileMine$.subscribe((profile) => {
         if (profile) {
-
           this.uid = profile.uid;
           this.editProfileForm.setValue({
             name: profile.userName,
@@ -111,21 +116,18 @@ export class EditProfileComponent implements OnInit, OnDestroy {
       }),
       this.isUpdateSuccess$.subscribe((isUpdateSuccess) => {
         if (isUpdateSuccess) {
-          // this.dialog.closeAll();
           this.store.dispatch(ProfileActions.getMine({ uid: this.uid }));
-          //when update success, show snackbar
           this.snackBar.open('Update successfully', 'Close', {
             duration: 2000,
             horizontalPosition: 'right',
             verticalPosition: 'top',
           });
-
           this.dialog.closeAll();
         }
-
       }),
     );
   }
+
   ngOnDestroy(): void {
     this.subscription.forEach((sub) => {
       sub.unsubscribe();
@@ -133,6 +135,7 @@ export class EditProfileComponent implements OnInit, OnDestroy {
     this.store.dispatch(StorageActions.clearState());
     this.store.dispatch(ProfileActions.clearUpdateState());
   }
+
   onSelectedFile(e: any): void {
     if (e.target.files) {
       console.log(e.target.files);
@@ -155,11 +158,25 @@ export class EditProfileComponent implements OnInit, OnDestroy {
   }
 
   onSaveClick(): void {
-    // this.avatarChanged.emit(this.url);
+    const nameControl = this.editProfileForm.get('name');
+    if (nameControl?.invalid) {
+      let message = 'Name must be at least 10 characters long';
+      if (nameControl.hasError('specialCharacters')) {
+        message = 'Name must not contain special characters';
+      } else if (nameControl.hasError('startingNumber')) {
+        message = 'Name must not start with a number';
+      }
+      this.snackBar.open(message, 'Close', {
+        duration: 2000,
+        horizontalPosition: 'right',
+        verticalPosition: 'top',
+      });
+      return;
+    }
+
     this.profileForm = {
       uid: this.editProfileForm.value.uid ?? '',
-      avatarUrl:
-        this.profileForm.avatarUrl ?? this.profileMine.avatarUrl,
+      avatarUrl: this.profileForm.avatarUrl ?? this.profileMine.avatarUrl,
       email: this.editProfileForm.value.email ?? '',
       bio: this.editProfileForm.value.bio ?? '',
       userName: this.editProfileForm.value.name ?? '',
@@ -170,18 +187,21 @@ export class EditProfileComponent implements OnInit, OnDestroy {
         mine: this.profileForm,
       }),
     );
-
-    // this.dialog.closeAll();
-    // this.clearInput();
   }
+
   clearName(): void {
     this.editProfileForm.patchValue({
       name: '',
     });
   }
+
   clearBio(): void {
     this.editProfileForm.patchValue({
       bio: '',
     });
+  }
+
+  get nameHasMinLengthError(): boolean {
+    return this.editProfileForm.get('name')?.hasError('minlength') ?? false;
   }
 }

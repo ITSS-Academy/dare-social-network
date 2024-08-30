@@ -55,6 +55,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   subscription: Subscription[] = [];
   getAllPost$ = this.store.select('post', 'posts');
   tempArray: PostModel[] = [];
+  shuffled = false;
+  isLoading = false;
 
   ngOnInit(): void {
     this.subscription.push(
@@ -65,6 +67,11 @@ export class HomeComponent implements OnInit, OnDestroy {
           console.log(this.tempArray);
           this.posts = [...this.tempArray, ...posts.data];
           this.itemsCount = posts.limitNumber;
+          if (!this.shuffled && this.posts.length >= this.itemsCount) {
+            this.shufflePosts();
+            this.shuffled = true;
+          }
+          this.isLoading = false;
         }
       }),
     );
@@ -72,8 +79,17 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   posts: PostModel[] = [];
 
+  private shufflePosts() {
+    for (let i = this.posts.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [this.posts[i], this.posts[j]] = [this.posts[j], this.posts[i]];
+    }
+  }
+
   onScrollDown(ev: any) {
     console.log('scrolled down!!', ev);
+    if (this.isLoading) return;
+    this.isLoading = true;
     this.currentPage += 1;
     console.log('page', this.currentPage);
     console.log('item', this.itemsCount);
@@ -88,6 +104,8 @@ export class HomeComponent implements OnInit, OnDestroy {
           limitNumber: this.size,
         }),
       );
+    } else {
+      this.isLoading = false;
     }
   }
 }
