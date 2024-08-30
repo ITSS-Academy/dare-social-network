@@ -145,6 +145,7 @@ img{
 .masonry-container {
   column-count: 6;
   column-gap: 16px;
+  padding-bottom: 20px;
 }
 
 .masonry-item {
@@ -208,6 +209,7 @@ img{
 @media only screen and (max-width: 768px) {
   .masonry-container {
     column-count: 3;
+    padding-bottom: 100px;
   }
 }
 
